@@ -3,37 +3,37 @@ import json
 import psycopg2
 from prometheus_client import start_http_server, Counter
 
-# Start Prometheus metrics server (on port 8001)
+# Start Prometheus HTTP metrics server on port 8001
 start_http_server(8001)
 
-# Define Prometheus Counter
-messages_consumed = Counter('messages_consumed_total', 'Total number of messages consumed')
+# Define a Prometheus counter metric
+messages_consumed = Counter('messages_consumed_total', 'Total messages consumed')
 
-# Set up Kafka Consumer
+# Kafka consumer setup
 consumer = KafkaConsumer(
     'transactions',
     bootstrap_servers='kafka:9092',
     value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-    group_id='consumer-group-1'
+    group_id='my-consumer-group'
 )
 
-# Connect to PostgreSQL
+# PostgreSQL connection
 conn = psycopg2.connect(
     dbname='transactions_db',
     user='vasanth',
-    password='yourpassword',  # Update with your actual password
+    password='devops123',
     host='postgres',
     port='5432'
 )
 cursor = conn.cursor()
 
-print("Consumer started and listening for messages...")
+print("Consumer started. Waiting for messages...")
 
-# Consume messages and insert into DB
 for msg in consumer:
     data = msg.value
-    print(f"Consumed message: {data}")
+    print(f"Received: {data}")
 
+    # Insert into DB
     cursor.execute(
         "INSERT INTO transactions (transaction_id, description, amount, status, created_at) VALUES (%s, %s, %s, %s, %s)",
         (
@@ -46,6 +46,6 @@ for msg in consumer:
     )
     conn.commit()
 
-    # Increment Prometheus counter
+    # 📈 Increment Prometheus metric here
     messages_consumed.inc()
 

@@ -1,12 +1,13 @@
+# File: promtail/config.yml
 server:
-  http_listen_port: 3101
-  grpc_listen_port: 9095
+  http_listen_port: 9080
+  grpc_listen_port: 0
 
 positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://loki:3100/api/prom/push
+  - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
   - job_name: system
@@ -15,5 +16,5 @@ scrape_configs:
           - localhost
         labels:
           job: varlogs
-          __path__: /var/log/*log
+          __path__: /var/log/*.log
 

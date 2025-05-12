@@ -1,0 +1,134 @@
+Overview
+This assessment demonstrates the setup of a real-time event-driven architecture using Kafka as the message broker, FastAPI for producing events, Python for consuming and persisting data into PostgreSQL, and Docker Compose for orchestration. It integrates a full monitoring and observability stack using Prometheus, Grafana, Loki, Promtail, Node Exporter, cAdvisor, and Kafka Exporter.
+
+🧱 Project Structure
+less
+Copy
+Edit
+assessment-3/
+│
+├── docker-compose.yml
+├── producer/
+│   ├── main.py
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── consumer/
+│   ├── main.py
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── monitoring/
+│   ├── prometheus.yml
+│   └── promtail-config.yml
+│
+└── grafana/
+    └── (Optional: dashboards, provisioning, etc.)
+⚙️ Technologies Used
+Kafka + Zookeeper: Message streaming platform
+
+FastAPI (Producer): Publishes events to Kafka
+
+Python (Consumer): Reads Kafka events and writes to PostgreSQL
+
+PostgreSQL: Database for storing transaction data
+
+Prometheus: Metrics collection and monitoring
+
+Grafana: Visualization dashboard
+
+Loki + Promtail: Log aggregation
+
+Kafka Exporter: Kafka metrics for Prometheus
+
+Node Exporter: System metrics
+
+cAdvisor: Container metrics
+
+🧪 Setup Instructions
+1. ✅ Clone the Repo
+bash
+Copy
+Edit
+git clone https://github.com/your-username/assessment-3.git
+cd assessment-3
+2. ✅ Verify Monitoring Configuration
+Make sure the following files exist:
+
+monitoring/prometheus.yml
+
+monitoring/promtail-config.yml
+
+And your docker-compose.yml volume mounts point correctly to them:
+
+yaml
+Copy
+Edit
+prometheus:
+  volumes:
+    - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+
+promtail:
+  volumes:
+    - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
+3. ✅ Start the Stack
+bash
+Copy
+Edit
+docker-compose down -v  # Stop and remove volumes
+docker-compose up -d --build
+This will:
+
+Build and start all services
+
+Automatically run producer and consumer
+
+Connect Prometheus to exporters and services
+
+🔍 Verifying Components
+Kafka UI: http://localhost:8080
+
+Grafana: http://localhost:3000 (Default: admin/admin)
+
+Prometheus: http://localhost:9090
+
+Loki: http://localhost:3100
+
+📤 Produce Transactions
+Use Postman or curl to test the API:
+
+bash
+Copy
+Edit
+curl -X POST http://localhost:8000/produce \
+     -H "Content-Type: application/json" \
+     -d '{"transaction_id": 101, "amount": 5000, "type": "credit"}'
+📥 Consume & Store in PostgreSQL
+Consumer service will automatically read messages from Kafka and insert them into PostgreSQL.
+
+📊 Monitoring Dashboards (Grafana)
+You can create panels for:
+
+Kafka metrics via Kafka Exporter
+
+System metrics via Node Exporter
+
+Container stats via cAdvisor
+
+Consumer & Producer log monitoring via Loki
+
+Prometheus uptime and custom metrics
+
+🐛 Troubleshooting Tips
+Mount error: Make sure all host paths in volumes: exist and are valid files or directories.
+
+Duplicate mount points: Clean up old entries or conflicting volumes: in docker-compose.yml.
+
+Prometheus.yml error: Ensure correct YAML formatting and that the file is not a directory.
+
+✅ Status
+✅ Kafka, Producer, Consumer, PostgreSQL
+✅ Prometheus + Exporters
+✅ Grafana Dashboards
+✅ Loki + Promtail for logs
+✅ Containerized with Docker Compose
